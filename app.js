@@ -52,7 +52,12 @@ const SERVER_URL = (process.env.SERVER_URL) ?
   config.get('serverURL');
 
 const USAGE_MESSAGE = "Sorry, I don\'t understand :( \nUsage: Subscribe me to COURSE_CODE [CLASS_NUM]/[SECTION]\nEx: Subscribe me to CS 343\nEx: Subscribe me to ITAL 101 7542\nEx: Subscribe me to ITAL 155 LEC 001";
-const DUE_DATES = "SE 390 Internal - Monday, Oct 3rd\nCS 348 A1 - Oct 6th\nCS 486 A1 - Oct 7th\nCS 458 A1 - Oct 7th\nCS 343 A2 - Oct 9th\nCS 343 A3 - Oct 24th";
+const DUE_DATES = "SE 390 Internal - Monday, Oct 3rd\n\
+                  CS 348 A1 - Thursday, Oct 6th\n\
+                  CS 486 A1 - Friday, Oct 7th\n\
+                  CS 458 A1 - Friday, Oct 7th\n\
+                  CS 343 A2 - Sunday, Oct 9th\n\
+                  CS 343 A3 - Monday, Oct 24th";
 
 const SUBSCRIBE_PREFIX = "Subscribe me to".toLowerCase()
 
