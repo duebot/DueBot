@@ -1,2 +1,0 @@
-# DueBot
-Facebook Due Bot
