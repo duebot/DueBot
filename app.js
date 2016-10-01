@@ -52,8 +52,9 @@ const SERVER_URL = (process.env.SERVER_URL) ?
   config.get('serverURL');
 
 const USAGE_MESSAGE = "Sorry, I don\'t understand :( \nUsage: Subscribe me to COURSE_CODE [CLASS_NUM]/[SECTION]\nEx: Subscribe me to CS 343\nEx: Subscribe me to ITAL 101 7542\nEx: Subscribe me to ITAL 155 LEC 001";
+const DUE_DATES = "SE 390 Internal - Monday, Oct 3rd\nCS 348 A1 - Oct 6th\nCS 486 A1 - Oct 7th\CS 458 A1 - Oct 7th\nCS 343 A2 - Oct 9th\nCS 343 A3 - Oct 24th";
 
-const SUSCRIBE_PREFIX = "Subscribe me to".toLowerCase()
+const SUBSCRIBE_PREFIX = "Subscribe me to".toLowerCase()
 
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
   console.error("Missing config values");
@@ -206,8 +207,10 @@ function receivedAuthentication(event) {
 }
 
 function getIntent(messageText) {
-  if (messageText.toLowerCase().startsWith(SUSCRIBE_PREFIX)){
+  if (messageText.toLowerCase().startsWith(SUBSCRIBE_PREFIX)){
     return "subscribe";
+  } else if (messageText.toLowerCase().startsWith("due")) {
+    return "due"
   }
   return "default";
 }
@@ -268,6 +271,9 @@ function receivedMessage(event) {
       case 'subscribe':
         sendTextMessage(senderID, "Successfully subsribed!");
         break;
+      case 'due':
+        sendTextMessage(senderID, DUE_DATES )
+
       default:
         sendTextMessage(senderID, USAGE_MESSAGE);
     }
