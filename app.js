@@ -163,12 +163,12 @@ app.get('/test', (req, res) => {
     });
   });
 
-var interval = setInterval(function(str1, str2) {
-  console.log(str1 + " " + str2);
-}, 1000, "Hello.", "How are you?");
+  var interval = setInterval(function(str1, str2) {
+    console.log(str1 + " " + str2);
+  }, 1000, "Hello.", "How are you?");
 
-// clear the chron job
-// clearInterval(interval);
+  // clear the chron job
+  // clearInterval(interval);
 });
 
 /*
