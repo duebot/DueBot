@@ -1,6 +1,7 @@
 {
-    "appSecret": "",
-    "pageAccessToken": "",
-    "validationToken": "",
-    "serverURL": ""
+    "appSecret": "a",
+    "pageAccessToken": "a",
+    "validationToken": "a",
+    "serverURL": "a",
+    "uwApiKey": "29553af2b42a493c1765fb7210339b56"
 }

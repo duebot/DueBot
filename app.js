@@ -51,7 +51,11 @@ const SERVER_URL = (process.env.SERVER_URL) ?
   (process.env.SERVER_URL) :
   config.get('serverURL');
 
-if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
+const UW_API_KEY = (process.env.UW_API_KEY) ?
+  (process.env.UW_API_KEY) :
+  config.get('uwApiKey');
+
+if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL && UW_API_KEY)) {
   console.error("Missing config values");
   process.exit(1);
 }
@@ -139,6 +143,15 @@ app.get('/authorize', function(req, res) {
     accountLinkingToken: accountLinkingToken,
     redirectURI: redirectURI,
     redirectURISuccess: redirectURISuccess
+  });
+});
+
+
+const uwapi = require('uwapi')(UW_API_KEY);
+
+app.get('/test', (req, res) => {
+  uwapi.termsList().then((terms) => {
+    res.send({ current_term: terms.current_term });
   });
 });
 
