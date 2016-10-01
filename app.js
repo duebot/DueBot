@@ -151,7 +151,16 @@ const uwapi = require('uwapi')(UW_API_KEY);
 
 app.get('/test', (req, res) => {
   uwapi.termsList().then((terms) => {
-    res.send({ current_term: terms.current_term });
+    uwapi.termsSchedule({term_id: terms.current_term, subject: "MATH", catalog_number: "115"}).then((courses) => {
+      var spots = [];
+      for (var i=0; i<courses.length; i++) {
+        spots.push(courses[i].enrollment_capacity - courses[i].enrollment_total);
+        // if (courses[i].enrollment_capacity - courses[i].enrollment_total > 0) {
+        //   // there's a spot! do something here
+        // }
+      }
+      res.send(spots);
+    });
   });
 });
 
