@@ -51,6 +51,10 @@ const SERVER_URL = (process.env.SERVER_URL) ?
   (process.env.SERVER_URL) :
   config.get('serverURL');
 
+const USAGE_MESSAGE = "Sorry, I don\'t understand :( \nUsage: Subscribe me to COURESE_CODE [CLASS_NUM]/[SECTION]\nEx: Subscribe me to CS 343\nEx:Subscribe me to ITAL 101 7542\nEx:Subscribe me to ITAL 155 LEC 001";
+
+const SUSCRIBE_PREFIX = "Subscribe me to ".toLowerCase()
+
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
   console.error("Missing config values");
   process.exit(1);
@@ -201,6 +205,13 @@ function receivedAuthentication(event) {
   sendTextMessage(senderID, "Authentication successful");
 }
 
+function getIntent(messageText) {
+  if (messageText.toLowerCase().startsWith(SUSCRIBE_PREFIX)){
+    return 'subscribe';
+  }
+  return 'default';
+}
+
 /*
  * Message Event
  *
@@ -250,65 +261,15 @@ function receivedMessage(event) {
   }
 
   if (messageText) {
-
     // If we receive a text message, check to see if it matches any special
     // keywords and send back the corresponding example. Otherwise, just echo
     // the text we received.
     switch (messageText) {
-      case 'image':
-        sendImageMessage(senderID);
+      case 'subscribe':
+        sendTextMessage(senderID, "Successfully subsribed!");
         break;
-
-      case 'gif':
-        sendGifMessage(senderID);
-        break;
-
-      case 'audio':
-        sendAudioMessage(senderID);
-        break;
-
-      case 'video':
-        sendVideoMessage(senderID);
-        break;
-
-      case 'file':
-        sendFileMessage(senderID);
-        break;
-
-      case 'button':
-        sendButtonMessage(senderID);
-        break;
-
-      case 'generic':
-        sendGenericMessage(senderID);
-        break;
-
-      case 'receipt':
-        sendReceiptMessage(senderID);
-        break;
-
-      case 'quick reply':
-        sendQuickReply(senderID);
-        break;        
-
-      case 'read receipt':
-        sendReadReceipt(senderID);
-        break;        
-
-      case 'typing on':
-        sendTypingOn(senderID);
-        break;        
-
-      case 'typing off':
-        sendTypingOff(senderID);
-        break;        
-
-      case 'account linking':
-        sendAccountLinking(senderID);
-        break;
-
       default:
-        sendTextMessage(senderID, messageText);
+        sendTextMessage(senderID, USAGE_MESSAGE);
     }
   } else if (messageAttachments) {
     sendTextMessage(senderID, "Message with attachment received");
