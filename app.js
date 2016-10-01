@@ -51,9 +51,9 @@ const SERVER_URL = (process.env.SERVER_URL) ?
   (process.env.SERVER_URL) :
   config.get('serverURL');
 
-const USAGE_MESSAGE = "Sorry, I don\'t understand :( \nUsage: Subscribe me to COURESE_CODE [CLASS_NUM]/[SECTION]\nEx: Subscribe me to CS 343\nEx:Subscribe me to ITAL 101 7542\nEx:Subscribe me to ITAL 155 LEC 001";
+const USAGE_MESSAGE = "Sorry, I don\'t understand :( \nUsage: Subscribe me to COURSE_CODE [CLASS_NUM]/[SECTION]\nEx: Subscribe me to CS 343\nEx: Subscribe me to ITAL 101 7542\nEx: Subscribe me to ITAL 155 LEC 001";
 
-const SUSCRIBE_PREFIX = "Subscribe me to ".toLowerCase()
+const SUSCRIBE_PREFIX = "Subscribe me to".toLowerCase()
 
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL)) {
   console.error("Missing config values");
@@ -207,9 +207,9 @@ function receivedAuthentication(event) {
 
 function getIntent(messageText) {
   if (messageText.toLowerCase().startsWith(SUSCRIBE_PREFIX)){
-    return 'subscribe';
+    return "subscribe";
   }
-  return 'default';
+  return "default";
 }
 
 /*
@@ -264,7 +264,7 @@ function receivedMessage(event) {
     // If we receive a text message, check to see if it matches any special
     // keywords and send back the corresponding example. Otherwise, just echo
     // the text we received.
-    switch (messageText) {
+    switch (getIntent(messageText)) {
       case 'subscribe':
         sendTextMessage(senderID, "Successfully subsribed!");
         break;
