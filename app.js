@@ -163,10 +163,10 @@ const uwapi = require('uwapi')(UW_API_KEY);
 
 function getCourseStatus(subject, catalogNumber, callback, errorCallBack) {
   uwapi.termsList().then((terms) => {
-    if (terms.length === 0) {
-      errorCallBack();
-    }
     uwapi.termsSchedule({term_id: terms.current_term, subject: subject, catalog_number: catalogNumber}).then((courses) => {
+      if (courses.length === 0) {
+        errorCallBack();
+      }
       for (var i = 0; i < courses.length; i++) {
         if (courses[i].enrollment_capacity - courses[i].enrollment_total > 0) {
           callback(courses[i]);
