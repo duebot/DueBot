@@ -55,7 +55,7 @@ const UW_API_KEY = (process.env.UW_API_KEY) ?
   (process.env.UW_API_KEY) :
   config.get('uwApiKey');
 
-const USAGE_MESSAGE = "Sorry, I don\'t understand :( \nUsage: Subscribe me to COURSE_CODE/CLASS_NUMBER\nEx: Subscribe me to CS 343\nEx: Subscribe me to CS 343 5953";
+const USAGE_MESSAGE = "Sorry, I don\'t understand :( \nUsage: Subscribe me to COURSE_CODE [CLASS_NUMBER]\nEx: Subscribe me to CS 343\nEx: Subscribe me to CS 343 5953";
 
 const DUE_DATES =
 "SE 390 Internal - Monday, Oct 3rd\n\
@@ -166,7 +166,7 @@ function getCourseStatus(subject, catalogNumber, callback, errorCallBack, novaca
     uwapi.termsSchedule({term_id: terms.current_term, subject: subject, catalog_number: catalogNumber}).then((courses) => {
       if (courseNumber !== "") {
         courses = courses.filter(function(el) {
-          return el.class_number === courseNumber;
+          return el.class_number.toString() === courseNumber;
         });
       }
       if (courses.length === 0) {
