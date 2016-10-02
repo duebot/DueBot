@@ -185,7 +185,7 @@ function getCourseStatus(subject, catalogNumber, callback, errorCallBack, novaca
 }
 
 function intervalGetCourseStatus(subject, catalogNumber, callback, courseNumber, failToFindVacancyCallback) {
-  var callCount = 3;
+  var callCount = 100;
   var interval = setInterval(() => {
     getCourseStatus(subject, catalogNumber, (course) => {
         callback();
@@ -198,7 +198,7 @@ function intervalGetCourseStatus(subject, catalogNumber, callback, courseNumber,
       failToFindVacancyCallback();
       clearInterval(interval);
     }
-  }, 4*1000);
+  }, 1800*1000);
 }
 
 app.get('/test', (req, res) => {
