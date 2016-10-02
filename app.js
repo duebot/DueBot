@@ -55,7 +55,7 @@ const UW_API_KEY = (process.env.UW_API_KEY) ?
   (process.env.UW_API_KEY) :
   config.get('uwApiKey');
 
-const USAGE_MESSAGE = "Sorry, I don\'t understand :( \nUsage: Subscribe me to COURSE_CODE [CLASS_NUM]/[SECTION]\nEx: Subscribe me to CS 343\nEx: Subscribe me to ITAL 101 7542\nEx: Subscribe me to ITAL 155 LEC 001";
+const USAGE_MESSAGE = "Sorry, I don\'t understand :( \nUsage: Subscribe me to COURSE_CODE/CLASS_NUMBER\nEx: Subscribe me to CS 343\nEx: Subscribe me to 7542";
 
 const DUE_DATES =
 "SE 390 Internal - Monday, Oct 3rd\n\
@@ -325,28 +325,29 @@ function receivedMessage(event) {
     switch (getIntent(messageText)) {
       case 'subscribe':
         var tokens = messageText.split(" ");
-        if (tokens.length < 5 || tokens.length > 7){
+        if (tokens.length < 4 || tokens.length > 5){
           reject(senderID);
           break;
         }
-        var subject = tokens[3];
-        var catalogNumber = tokens[4];
-        var courseNumber = null;
-        var section = null;
-        var filter = "";
-        if (tokens.length == 6){
-          courseNumber = tokens[5];
-          filter = " " + courseNumber;
-        }else if (tokens.length == 7){
-          section = tokens[5] + " " + tokens[6];
-          filter = " " + section;
+        var subject = "";
+        var catalogNumber = "";
+        var courseNumber = "";
+        var target = "";
+
+        if (tokens.length == 5){
+          subject = tokens[3];
+          catalogNumber = tokens[4];
+          target = subject + " " + catalogNumber;
+        }else if (tokens.length == 4){
+          courseNumber = tokens[3];
+          target = courseNumber;
         }
         intervalGetCourseStatus(subject, catalogNumber, ()=>{
-          sendTextMessage(senderID, subject + " " + catalogNumber + filter + " now has a vacancy!");
+          sendTextMessage(senderID, target + " now has a vacancy!");
         }, ()=>{
-          sendTextMessage(senderID, subject + " " + catalogNumber + filter + " is an invalid course code!");
+          sendTextMessage(senderID, target + " is an invalid course code!");
         });
-        sendTextMessage(senderID, "Successfully subscribed to " + subject + " " + catalogNumber + filter);
+        sendTextMessage(senderID, "Successfully subscribed to " + target);
         break;
       case 'due':
         sendTextMessage(senderID, DUE_DATES )
