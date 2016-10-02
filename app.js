@@ -222,7 +222,9 @@ function getIntent(messageText) {
   return "default";
 }
 
-function 
+function reject(senderID){
+  sendTextMessage(senderID, USAGE_MESSAGE);
+}
 
 /*
  * Message Event
@@ -278,8 +280,11 @@ function receivedMessage(event) {
     // the text we received.
     switch (getIntent(messageText)) {
       case 'subscribe':
-
         tokens = messageText.split("\\s+");
+        if (tokens.length < 5 || tokens.length > 7){
+          reject(senderID);
+          break;
+        }
         var subject = tokens[3];
         var catalogNumber = tokens[4];
         var courseNumber = null;
@@ -291,10 +296,6 @@ function receivedMessage(event) {
         }else if (tokens.length == 7){
           section = tokens[5] + " " + tokens[6];
           filter = " " + section;
-        }else if (tokens.length > 7){
-          // Reject
-          sendTextMessage(senderID, USAGE_MESSAGE);
-          break;
         }
         sendTextMessage(senderID, "Successfully subscribed to " + subject + " " + catalogNumber + filter);
         break;
