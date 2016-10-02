@@ -57,7 +57,7 @@ const UW_API_KEY = (process.env.UW_API_KEY) ?
 
 const USAGE_MESSAGE = "Sorry, I don\'t understand :( \nUsage: Subscribe me to COURSE_CODE [CLASS_NUM]/[SECTION]\nEx: Subscribe me to CS 343\nEx: Subscribe me to ITAL 101 7542\nEx: Subscribe me to ITAL 155 LEC 001";
 
-const DUE_DATES = 
+const DUE_DATES =
 "SE 390 Internal - Monday, Oct 3rd\n\
 CS 348 A1 - Thursday, Oct 6th\n\
 CS 486 A1 - Friday, Oct 7th\n\
@@ -161,9 +161,12 @@ app.get('/authorize', function(req, res) {
 
 const uwapi = require('uwapi')(UW_API_KEY);
 
-function getCourseStatus(subject, catalogNumber, callback) {
+function getCourseStatus(subject, catalogNumber, callback, errorCallBack) {
   uwapi.termsList().then((terms) => {
     uwapi.termsSchedule({term_id: terms.current_term, subject: subject, catalog_number: catalogNumber}).then((courses) => {
+      if (courses.length === 0) {
+        errorCallBack();
+      }
       for (var i = 0; i < courses.length; i++) {
         if (courses[i].enrollment_capacity - courses[i].enrollment_total > 0) {
           callback(courses[i]);
@@ -174,13 +177,20 @@ function getCourseStatus(subject, catalogNumber, callback) {
   });
 }
 
-function intervalGetCourseStatus(subject, catalogNumber, callback) {
+function intervalGetCourseStatus(subject, catalogNumber, callback, errorCallBack) {
+  var callCount = 100;
   var interval = setInterval(() => {
     getCourseStatus(subject, catalogNumber, (course) => {
       if (course) {
         callback();
+      }
+      if (course || callCount <= 0) {
         clearInterval(interval);
       }
+      callCount--;
+    }, () => {
+      errorCallBack();
+      clearInterval(interval);
     });
   }, 10000);
 }
@@ -323,8 +333,8 @@ function receivedMessage(event) {
         var subject = tokens[3];
         var catalogNumber = tokens[4];
         var courseNumber = null;
-        var section = null;    
-        var filter = "";   
+        var section = null;
+        var filter = "";
         if (tokens.length == 6){
           courseNumber = tokens[5];
           filter = " " + courseNumber;
