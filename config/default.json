@@ -1,7 +1,7 @@
 {
-    "appSecret": "a",
-    "pageAccessToken": "a",
-    "validationToken": "a",
-    "serverURL": "a",
+    "appSecret": "31eb1bbb419166362b825adc1dcddf65",
+    "pageAccessToken": "EAAXnWApgyM8BAFPyKEYQWZCdOSXuRiQ8CXuZCTZCHschPbVkxoSZBXeVZCAzp0eLvdgQE6Xrjv0txZA7CNfrzcHtITqZAQt69Nl1NeZAsZBAZBUojriMZCsZCSfaj5SNM8eUDHYVTtTsMcZAZBFJ8Q8Psv3AJIZApoEbSsJmz2QHyUaJcbe1wZDZD",
+    "validationToken": "botsmasterrace",
+    "serverURL": "https://due-bot.herokuapp.com/",
     "uwApiKey": "29553af2b42a493c1765fb7210339b56"
 }
