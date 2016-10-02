@@ -280,7 +280,7 @@ function receivedMessage(event) {
     // the text we received.
     switch (getIntent(messageText)) {
       case 'subscribe':
-        var tokens = messageText.split("\\s+");
+        var tokens = messageText.split(" ");
         if (tokens.length < 5 || tokens.length > 7){
           reject(senderID);
           break;
