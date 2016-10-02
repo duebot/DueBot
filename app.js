@@ -161,11 +161,11 @@ app.get('/authorize', function(req, res) {
 
 const uwapi = require('uwapi')(UW_API_KEY);
 
-function getCourseStatus(subject, catalogNumber, callback) {
+function getCourseStatus(subject, catalogNumber, callback, errorCallBack) {
   uwapi.termsList().then((terms) => {
-    // if (!(terms.length > 0)) {
-    //   callback(404);
-    // }
+    if (terms.length === 0) {
+      errorCallBack();
+    }
     uwapi.termsSchedule({term_id: terms.current_term, subject: subject, catalog_number: catalogNumber}).then((courses) => {
       for (var i = 0; i < courses.length; i++) {
         if (courses[i].enrollment_capacity - courses[i].enrollment_total > 0) {
@@ -177,7 +177,7 @@ function getCourseStatus(subject, catalogNumber, callback) {
   });
 }
 
-function intervalGetCourseStatus(subject, catalogNumber) {
+function intervalGetCourseStatus(subject, catalogNumber, errorCallBack) {
   var callCount = 100;
   var interval = setInterval(() => {
     getCourseStatus(subject, catalogNumber, (course) => {
@@ -185,6 +185,9 @@ function intervalGetCourseStatus(subject, catalogNumber) {
         clearInterval(interval);
       }
       callCount--;
+    }, () => {
+      errorCallBack();
+      clearInterval(interval);
     });
   }, 10000);
 }
