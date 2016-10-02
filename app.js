@@ -184,8 +184,8 @@ function getCourseStatus(subject, catalogNumber, callback, errorCallBack, novaca
   });
 }
 
-function intervalGetCourseStatus(subject, catalogNumber, callback, courseNumber) {
-  var callCount = 100;
+function intervalGetCourseStatus(subject, catalogNumber, callback, courseNumber, failToFindVacancyCallback) {
+  var callCount = 3;
   var interval = setInterval(() => {
     getCourseStatus(subject, catalogNumber, (course) => {
         callback();
@@ -195,9 +195,10 @@ function intervalGetCourseStatus(subject, catalogNumber, callback, courseNumber)
     }, () => {}, courseNumber);
     callCount--;
     if (callCount <= 0) {
+      failToFindVacancyCallback();
       clearInterval(interval);
     }
-  }, 10000);
+  }, 4*1000);
 }
 
 app.get('/test', (req, res) => {
@@ -353,10 +354,14 @@ function receivedMessage(event) {
           sendTextMessage(senderID, target + " now has a vacancy!");
         }
 
+        var failToFindVacancyCallback = ()=>{ // Vacancy callback
+          sendTextMessage(senderID, "Sorry, we have been trying to find a vacancy for " + target + ", but it seems like it is still packed :/ Please try again later!");
+        }
+
         getCourseStatus(subject, catalogNumber, vacancyCall, ()=>{ // Error callback
           sendTextMessage(senderID, target + " is an invalid course code!");
         }, ()=>{ // No vacancy callback
-          intervalGetCourseStatus(subject, catalogNumber, vacancyCall, courseNumber);
+          intervalGetCourseStatus(subject, catalogNumber, vacancyCall, courseNumber, failToFindVacancyCallback);
           sendTextMessage(senderID, "Successfully subscribed to " + target);
         }, courseNumber);
 
