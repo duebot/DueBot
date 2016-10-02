@@ -181,17 +181,16 @@ function intervalGetCourseStatus(subject, catalogNumber, callback, errorCallBack
   var callCount = 100;
   var interval = setInterval(() => {
     getCourseStatus(subject, catalogNumber, (course) => {
-      if (course) {
         callback();
-      }
-      if (course || callCount <= 0) {
         clearInterval(interval);
-      }
-      callCount--;
     }, () => {
       errorCallBack();
       clearInterval(interval);
     });
+    callCount--;
+    if (callCount <= 0) {
+      clearInterval(interval);
+    }
   }, 10000);
 }
 
