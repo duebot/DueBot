@@ -149,28 +149,32 @@ app.get('/authorize', function(req, res) {
 
 const uwapi = require('uwapi')(UW_API_KEY);
 
-function getCourseStatus(subject, catalogNumber) {
+function getCourseStatus(subject, catalogNumber, callback) {
   uwapi.termsList().then((terms) => {
     uwapi.termsSchedule({term_id: terms.current_term, subject: subject, catalog_number: catalogNumber}).then((courses) => {
       for (var i = 0; i < courses.length; i++) {
         if (courses[i].enrollment_capacity - courses[i].enrollment_total > 0) {
-          return courses[i];
+          callback(courses[i]);
+          return;
         }
       }
     });
   });
-
-  var interval = setInterval(function(str1, str2) {
-    console.log(str1 + " " + str2);
-  }, 1000, "Hello.", "How are you?");
-
-  // clear the chron job
-  // clearInterval(interval);
 }
 
-// app.get('/test', (req, res) => {
-//   console.log('test hit');
-// });
+function intervalGetCourseStatus(subject, catalogNumber) {
+  var interval = setInterval(() => {
+    var a = getCourseStatus(subject, catalogNumber, (course) => {
+      if (course) {
+        clearInterval(interval);
+      }
+    });
+  }, 10000);
+}
+
+app.get('/test', (req, res) => {
+  intervalGetCourseStatus("MATH", "135");
+});
 
 /*
  * Verify that the callback came from Facebook. Using the App Secret from
