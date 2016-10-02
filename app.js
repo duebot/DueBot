@@ -351,7 +351,7 @@ function receivedMessage(event) {
         }
 
         var vacancyCall = ()=>{ // Vacancy callback
-          sendTextMessage(senderID, target + " now has a vacancy!");
+          sendVacancyButtonMessage(senderID, target + " now has a vacancy!");
         }
 
         var failToFindVacancyCallback = ()=>{ // Vacancy callback
@@ -593,6 +593,31 @@ function sendTextMessage(recipientId, messageText) {
 
   callSendAPI(messageData);
 }
+
+/*
+ * Send a button message using the Send API.
+ *
+ */
+function sendVacancyButtonMessage(recipientId, messageText) {
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message: {
+      attachment: {
+        type: "template",
+        payload: {
+          template_type: "button",
+          text: messageText,
+          buttons:[{
+            type: "web_url",
+            url: "https://quest.pecs.uwaterloo.ca/psp/SS/",
+            title: "Go add it!"
+          }]
+        }
+      }
+    }
+  };
 
 /*
  * Send a button message using the Send API.
