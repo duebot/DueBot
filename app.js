@@ -174,10 +174,11 @@ function getCourseStatus(subject, catalogNumber, callback) {
   });
 }
 
-function intervalGetCourseStatus(subject, catalogNumber) {
+function intervalGetCourseStatus(subject, catalogNumber, callback) {
   var interval = setInterval(() => {
-    var a = getCourseStatus(subject, catalogNumber, (course) => {
+    getCourseStatus(subject, catalogNumber, (course) => {
       if (course) {
+        callback();
         clearInterval(interval);
       }
     });
@@ -331,6 +332,9 @@ function receivedMessage(event) {
           section = tokens[5] + " " + tokens[6];
           filter = " " + section;
         }
+        intervalGetCourseStatus(subject, catalogNumber, ()=>{
+          sendTextMessage(senderID, subject + " " + catalogNumber + filter + " now has a vacancy!")
+        });
         sendTextMessage(senderID, "Successfully subscribed to " + subject + " " + catalogNumber + filter);
         break;
       case 'due':
