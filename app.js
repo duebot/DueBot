@@ -161,11 +161,12 @@ app.get('/authorize', function(req, res) {
 
 const uwapi = require('uwapi')(UW_API_KEY);
 
-function getCourseStatus(subject, catalogNumber, callback, errorCallBack) {
+function getCourseStatus(subject, catalogNumber, callback, errorCallBack, novacancyCallBack) {
   uwapi.termsList().then((terms) => {
     uwapi.termsSchedule({term_id: terms.current_term, subject: subject, catalog_number: catalogNumber}).then((courses) => {
       if (courses.length === 0) {
         errorCallBack();
+        return;
       }
       for (var i = 0; i < courses.length; i++) {
         if (courses[i].enrollment_capacity - courses[i].enrollment_total > 0) {
@@ -173,20 +174,20 @@ function getCourseStatus(subject, catalogNumber, callback, errorCallBack) {
           return;
         }
       }
+      novacancyCallBack();
     });
   });
 }
 
-function intervalGetCourseStatus(subject, catalogNumber, callback, errorCallBack) {
+function intervalGetCourseStatus(subject, catalogNumber, callback) {
   var callCount = 100;
   var interval = setInterval(() => {
     getCourseStatus(subject, catalogNumber, (course) => {
         callback();
         clearInterval(interval);
     }, () => {
-      errorCallBack();
       clearInterval(interval);
-    });
+    }, () => {});
     callCount--;
     if (callCount <= 0) {
       clearInterval(interval);
@@ -342,12 +343,18 @@ function receivedMessage(event) {
           courseNumber = tokens[3];
           target = courseNumber;
         }
-        intervalGetCourseStatus(subject, catalogNumber, ()=>{
+
+        var vacancyCall = ()=>{ // Vacancy callback
           sendTextMessage(senderID, target + " now has a vacancy!");
-        }, ()=>{
+        }
+
+        getCourseStatus(subject, catalogNumber, vacancyCall, ()=>{ // Error callback
           sendTextMessage(senderID, target + " is an invalid course code!");
+        }, ()=>{ // No vacancy callback
+          intervalGetCourseStatus(subject, catalogNumber, vacancyCall);
+          sendTextMessage(senderID, "Successfully subscribed to " + target);
         });
-        sendTextMessage(senderID, "Successfully subscribed to " + target);
+
         break;
       case 'due':
         sendTextMessage(senderID, DUE_DATES )
