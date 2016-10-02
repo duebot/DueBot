@@ -362,7 +362,7 @@ function receivedMessage(event) {
           sendTextMessage(senderID, target + " is an invalid course code!");
         }, ()=>{ // No vacancy callback
           intervalGetCourseStatus(subject, catalogNumber, vacancyCall, courseNumber, failToFindVacancyCallback);
-          sendTextMessage(senderID, "Successfully subscribed to " + target);
+          sendTextMessage(senderID, "Successfully subscribed to " + target + ". There are no spots currently available, We will let you know if and when there is a vacancy.");
         }, courseNumber);
 
         break;
