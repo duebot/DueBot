@@ -55,7 +55,7 @@ const UW_API_KEY = (process.env.UW_API_KEY) ?
   (process.env.UW_API_KEY) :
   config.get('uwApiKey');
 
-const USAGE_MESSAGE = "Sorry, I don\'t understand :( \nUsage: Subscribe me to COURSE_CODE/CLASS_NUMBER\nEx: Subscribe me to CS 343\nEx: Subscribe me to 7542";
+const USAGE_MESSAGE = "Sorry, I don\'t understand :( \nUsage: Subscribe me to COURSE_CODE/CLASS_NUMBER\nEx: Subscribe me to CS 343\nEx: Subscribe me to CS 343 5953";
 
 const DUE_DATES =
 "SE 390 Internal - Monday, Oct 3rd\n\
@@ -161,9 +161,14 @@ app.get('/authorize', function(req, res) {
 
 const uwapi = require('uwapi')(UW_API_KEY);
 
-function getCourseStatus(subject, catalogNumber, callback, errorCallBack, novacancyCallBack) {
+function getCourseStatus(subject, catalogNumber, callback, errorCallBack, novacancyCallBack, courseNumber) {
   uwapi.termsList().then((terms) => {
     uwapi.termsSchedule({term_id: terms.current_term, subject: subject, catalog_number: catalogNumber}).then((courses) => {
+      if (courseNumber !== "") {
+        courses = courses.filter(function(el) {
+          return el.class_number === courseNumber;
+        });
+      }
       if (courses.length === 0) {
         errorCallBack();
         return;
@@ -179,7 +184,7 @@ function getCourseStatus(subject, catalogNumber, callback, errorCallBack, novaca
   });
 }
 
-function intervalGetCourseStatus(subject, catalogNumber, callback) {
+function intervalGetCourseStatus(subject, catalogNumber, callback, courseNumber) {
   var callCount = 100;
   var interval = setInterval(() => {
     getCourseStatus(subject, catalogNumber, (course) => {
@@ -187,7 +192,7 @@ function intervalGetCourseStatus(subject, catalogNumber, callback) {
         clearInterval(interval);
     }, () => {
       clearInterval(interval);
-    }, () => {});
+    }, () => {}, courseNumber);
     callCount--;
     if (callCount <= 0) {
       clearInterval(interval);
@@ -326,7 +331,7 @@ function receivedMessage(event) {
     switch (getIntent(messageText)) {
       case 'subscribe':
         var tokens = messageText.split(" ");
-        if (tokens.length < 4 || tokens.length > 5){
+        if (tokens.length < 5 || tokens.length > 6){
           reject(senderID);
           break;
         }
@@ -335,13 +340,13 @@ function receivedMessage(event) {
         var courseNumber = "";
         var target = "";
 
-        if (tokens.length == 5){
-          subject = tokens[3];
-          catalogNumber = tokens[4];
-          target = subject + " " + catalogNumber;
-        }else if (tokens.length == 4){
-          courseNumber = tokens[3];
-          target = courseNumber;
+        subject = tokens[3];
+        catalogNumber = tokens[4];
+        target = subject + " " + catalogNumber;
+
+        if (tokens.length == 6){
+          courseNumber = tokens[5];
+          target = target + " " + courseNumber;
         }
 
         var vacancyCall = ()=>{ // Vacancy callback
@@ -351,9 +356,9 @@ function receivedMessage(event) {
         getCourseStatus(subject, catalogNumber, vacancyCall, ()=>{ // Error callback
           sendTextMessage(senderID, target + " is an invalid course code!");
         }, ()=>{ // No vacancy callback
-          intervalGetCourseStatus(subject, catalogNumber, vacancyCall);
+          intervalGetCourseStatus(subject, catalogNumber, vacancyCall, courseNumber);
           sendTextMessage(senderID, "Successfully subscribed to " + target);
-        });
+        }, courseNumber);
 
         break;
       case 'due':
