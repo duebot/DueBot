@@ -52,6 +52,7 @@ const SERVER_URL = (process.env.SERVER_URL) ?
   config.get('serverURL');
 
 const USAGE_MESSAGE = "Sorry, I don\'t understand :( \nUsage: Subscribe me to COURSE_CODE [CLASS_NUM]/[SECTION]\nEx: Subscribe me to CS 343\nEx: Subscribe me to ITAL 101 7542\nEx: Subscribe me to ITAL 155 LEC 001";
+
 const DUE_DATES = 
 "SE 390 Internal - Monday, Oct 3rd\n\
 CS 348 A1 - Thursday, Oct 6th\n\
@@ -221,6 +222,8 @@ function getIntent(messageText) {
   return "default";
 }
 
+function 
+
 /*
  * Message Event
  *
@@ -275,7 +278,25 @@ function receivedMessage(event) {
     // the text we received.
     switch (getIntent(messageText)) {
       case 'subscribe':
-        sendTextMessage(senderID, "Successfully subscribed!");
+
+        tokens = messageText.split("\\s+");
+        var subject = tokens[3];
+        var catalogNumber = tokens[4];
+        var courseNumber = null;
+        var section = null;    
+        var filter = "";   
+        if (tokens.length == 6){
+          courseNumber = tokens[5];
+          filter = " " + courseNumber;
+        }else if (tokens.length == 7){
+          section = tokens[5] + " " + tokens[6];
+          filter = " " + section;
+        }else if (tokens.length > 7){
+          // Reject
+          sendTextMessage(senderID, USAGE_MESSAGE);
+          break;
+        }
+        sendTextMessage(senderID, "Successfully subscribed to " + subject + " " + catalogNumber + filter);
         break;
       case 'due':
         sendTextMessage(senderID, DUE_DATES )
