@@ -617,7 +617,9 @@ function sendVacancyButtonMessage(recipientId, messageText) {
         }
       }
     }
-  };
+  }
+  callSendAPI(messageData);
+}
 
 /*
  * Send a button message using the Send API.
