@@ -342,7 +342,9 @@ function receivedMessage(event) {
           filter = " " + section;
         }
         intervalGetCourseStatus(subject, catalogNumber, ()=>{
-          sendTextMessage(senderID, subject + " " + catalogNumber + filter + " now has a vacancy!")
+          sendTextMessage(senderID, subject + " " + catalogNumber + filter + " now has a vacancy!");
+        }, ()=>{
+          sendTextMessage(senderID, subject + " " + catalogNumber + filter + " is an invalid course code!");
         });
         sendTextMessage(senderID, "Successfully subscribed to " + subject + " " + catalogNumber + filter);
         break;
