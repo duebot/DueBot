@@ -55,6 +55,18 @@ const UW_API_KEY = (process.env.UW_API_KEY) ?
   (process.env.UW_API_KEY) :
   config.get('uwApiKey');
 
+const USAGE_MESSAGE = "Sorry, I don\'t understand :( \nUsage: Subscribe me to COURSE_CODE [CLASS_NUM]/[SECTION]\nEx: Subscribe me to CS 343\nEx: Subscribe me to ITAL 101 7542\nEx: Subscribe me to ITAL 155 LEC 001";
+
+const DUE_DATES = 
+"SE 390 Internal - Monday, Oct 3rd\n\
+CS 348 A1 - Thursday, Oct 6th\n\
+CS 486 A1 - Friday, Oct 7th\n\
+CS 458 A1 - Friday, Oct 7th\n\
+CS 343 A2 - Sunday, Oct 9th\n\
+CS 343 A3 - Monday, Oct 24th";
+
+const SUBSCRIBE_PREFIX = "Subscribe me to".toLowerCase()
+
 if (!(APP_SECRET && VALIDATION_TOKEN && PAGE_ACCESS_TOKEN && SERVER_URL && UW_API_KEY)) {
   console.error("Missing config values");
   process.exit(1);
@@ -235,6 +247,19 @@ function receivedAuthentication(event) {
   sendTextMessage(senderID, "Authentication successful");
 }
 
+function getIntent(messageText) {
+  if (messageText.toLowerCase().startsWith(SUBSCRIBE_PREFIX)){
+    return "subscribe";
+  } else if (messageText.toLowerCase().startsWith("due")) {
+    return "due"
+  }
+  return "default";
+}
+
+function reject(senderID){
+  sendTextMessage(senderID, USAGE_MESSAGE);
+}
+
 /*
  * Message Event
  *
@@ -284,65 +309,35 @@ function receivedMessage(event) {
   }
 
   if (messageText) {
-
     // If we receive a text message, check to see if it matches any special
     // keywords and send back the corresponding example. Otherwise, just echo
     // the text we received.
-    switch (messageText) {
-      case 'image':
-        sendImageMessage(senderID);
+    switch (getIntent(messageText)) {
+      case 'subscribe':
+        var tokens = messageText.split(" ");
+        if (tokens.length < 5 || tokens.length > 7){
+          reject(senderID);
+          break;
+        }
+        var subject = tokens[3];
+        var catalogNumber = tokens[4];
+        var courseNumber = null;
+        var section = null;    
+        var filter = "";   
+        if (tokens.length == 6){
+          courseNumber = tokens[5];
+          filter = " " + courseNumber;
+        }else if (tokens.length == 7){
+          section = tokens[5] + " " + tokens[6];
+          filter = " " + section;
+        }
+        sendTextMessage(senderID, "Successfully subscribed to " + subject + " " + catalogNumber + filter);
         break;
-
-      case 'gif':
-        sendGifMessage(senderID);
+      case 'due':
+        sendTextMessage(senderID, DUE_DATES )
         break;
-
-      case 'audio':
-        sendAudioMessage(senderID);
-        break;
-
-      case 'video':
-        sendVideoMessage(senderID);
-        break;
-
-      case 'file':
-        sendFileMessage(senderID);
-        break;
-
-      case 'button':
-        sendButtonMessage(senderID);
-        break;
-
-      case 'generic':
-        sendGenericMessage(senderID);
-        break;
-
-      case 'receipt':
-        sendReceiptMessage(senderID);
-        break;
-
-      case 'quick reply':
-        sendQuickReply(senderID);
-        break;
-
-      case 'read receipt':
-        sendReadReceipt(senderID);
-        break;
-
-      case 'typing on':
-        sendTypingOn(senderID);
-        break;
-
-      case 'typing off':
-        sendTypingOff(senderID);
-        break;
-
-      case 'account linking':
-        sendAccountLinking(senderID);
-        break;
-
       default:
-        sendTextMessage(senderID, messageText);
+        sendTextMessage(senderID, USAGE_MESSAGE);
     }
   } else if (messageAttachments) {
     sendTextMessage(senderID, "Message with attachment received");
